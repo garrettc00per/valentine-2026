@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💝 A Very Important Question  💝</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            padding: 0 20px;
+        }
+        
+        .button-container {
+            position: relative;
+            width: 90vw;
+            max-width: 500px;
+            height: 60vh;
+            max-height: 400px;
+        }
+        
+        button {
+            position: absolute;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            touch-action: none;
+        }
+        
+        #yesBtn {
+            background-color: #ff6b9d;
+            color: white;
+            left: 30%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        
+        #yesBtn:hover {
+            background-color: #ff5a8d;
+        }
+        
+        #noBtn {
+            background-color: #95a5a6;
+            color: white;
+            left: 70%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .celebration {
+            display: none;
+            text-align: center;
+            color: white;
+            max-width: 90%;
+            padding: 20px;
+        }
+        
+        .celebration h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .hearts {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+        
+        .celebration p {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            button {
+                font-size: 1em;
+                padding: 12px 24px;
+            }
+            .celebration h2 {
+                font-size: 2em;
+            }
+            .celebration p {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="question">
+        <h1>B, will you be my Valentine? 💕</h1>
+        <div class="button-container">
+            <button id="yesBtn">Yes! 💖</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+    
+    <div class="celebration" id="celebration">
+        <h2>Yay! 🎉</h2>
+        <div class="hearts">💕💖💗💓💝</div>
+        <p>I wasn't taking ANY chances! </p>
+        <p>EIGHT Valentines together, and you still make my heart race like it's the first one. I love you, B! 💕</p>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const question = document.getElementById('question');
+        const celebration = document.getElementById('celebration');
+        const container = document.querySelector('.button-container');
+        let yesSize = 1;
+        
+        // Function to handle both mouse and touch events
+        function handleMove(clientX, clientY) {
+            const containerRect = container.getBoundingClientRect();
+            
+            // Get cursor/touch position relative to container
+            const cursorX = clientX - containerRect.left;
+            const cursorY = clientY - containerRect.top;
+            
+            // Get No button center position
+            const noBtnCenterX = noBtn.offsetLeft;
+            const noBtnCenterY = noBtn.offsetTop;
+            
+            // Calculate distance between cursor/touch and No button
+            const distanceX = cursorX - noBtnCenterX;
+            const distanceY = cursorY - noBtnCenterY;
+            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+            
+            // If cursor/touch is within 150px of No button, move it away
+            if (distance < 300) {
+                // Calculate opposite direction
+                const angle = Math.atan2(distanceY, distanceX);
+                const oppositeAngle = angle + Math.PI;
+                
+                // Move button away (further than cursor)
+                const moveDistance = 120;
+                let newX = noBtnCenterX + Math.cos(oppositeAngle) * moveDistance;
+                let newY = noBtnCenterY + Math.sin(oppositeAngle) * moveDistance;
+                
+                // Keep button within container bounds
+                const maxX = containerRect.width - noBtn.offsetWidth;
+                const maxY = containerRect.height - noBtn.offsetHeight;
+                
+                newX = Math.max(10, Math.min(newX, maxX - 10));
+                newY = Math.max(10, Math.min(newY, maxY - 10));
+                
+                noBtn.style.left = newX + 'px';
+                noBtn.style.top = newY + 'px';
+                noBtn.style.transform = 'none';
+                
+                // Make Yes button bigger each time No runs away (slower growth)
+                yesSize += 0.02;
+                yesBtn.style.fontSize = (1.2 * yesSize) + 'em';
+                yesBtn.style.padding = (15 * yesSize) + 'px ' + (30 * yesSize) + 'px';
+            }
+        }
+        
+        // Mouse events for desktop
+        container.addEventListener('mousemove', function(e) {
+            handleMove(e.clientX, e.clientY);
+        });
+        
+        // Touch events for mobile
+        container.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            handleMove(touch.clientX, touch.clientY);
+        });
+        
+        // Also move on touch start (when finger first touches screen)
+        container.addEventListener('touchstart', function(e) {
+            const touch = e.touches[0];
+            handleMove(touch.clientX, touch.clientY);
+        });
+        
+        yesBtn.addEventListener('click', function() {
+            question.style.display = 'none';
+            celebration.style.display = 'block';
+        });
+        
+        yesBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            question.style.display = 'none';
+            celebration.style.display = 'block';
+        });
+        
+        // Just in case she actually clicks No (she won't be able to!)
+        noBtn.addEventListener('click', function() {
+            alert('How did you even manage that?! 😂 You clearly meant Yes! 💕');
+        });
+        
+        noBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            alert('How did you even manage that?! 😂 You clearly meant Yes! 💕');
+        });
+    </script>
+</body>
+</html>
